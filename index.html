@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Estimación Puntual e Intervalos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Estilos rápidos para que el botón limpiar sea visible y bonito */
+    .btn-limpiar {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      z-index: 100;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-limpiar:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+    .btn-limpiar i {
+      font-size: 1.1em;
+    }
+    /* Aseguramos que el contenedor tenga posición relativa */
+    .tab-content {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR FIJO -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="imagen/image.png" alt="Logo">
+        <span>Universidad Politecnica Territorial "Alonso Gamero"</span>
+      </div>
+      <div class="nav-menu">
+        <a href="#media" class="nav-link">Media</a>
+        <a href="#proporcion" class="nav-link">Proporción</a>
+        <a href="#ejemplo" class="nav-link">Ejemplos</a>
+        <a href="#about" class="nav-link">Preguntas Frecuentes</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header id="inicio">
+      <h1>Calculadora de Estimación Puntual e Intervalos</h1>
+      <p class="subtitle">Herramienta interactiva para análisis estadístico</p>
+      <p class="autor">Desarrollado por:  – Trayecto III Trimestre II</p>
+    </header>
+
+    <!-- Pestañas -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="openTab(event,'media')"><span>Media</span></button>
+      <button class="tab-button" onclick="openTab(event,'proporcion')"><span>Proporción</span></button>
+      <button class="tab-button" onclick="openTab(event,'ejemplo')"><span>Ejemplo Práctico</span></button>
+      <button class="tab-button" onclick="openTab(event,'historial')"><span>Historial</span></button>
+    </div>
+
+    <!-- PESTAÑA MEDIA -->
+    <section id="media" class="tab-content" style="display:block;">
+      <!-- Botón Limpiar Visible -->
+      <button onclick="limpiarMedia()" class="btn-limpiar">
+        <i class="fas fa-trash-alt"></i> Limpiar datos
+      </button>
+
+      <div class="conceptos">
+        <h2>Conceptos Clave</h2>
+        <p>Estimamos la media poblacional (μ) a partir de una muestra. El intervalo de confianza indica con qué probabilidad el verdadero promedio está dentro del rango.</p>
+
+        <details>
+          <summary><strong>Fórmula del Intervalo de Confianza</strong></summary>
+          <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin:15px 0; text-align:center; font-size:1.1em;">
+            $$IC = \bar{x} \pm t_{\alpha/2, n-1} \cdot \dfrac{s}{\sqrt{n}}$$
+          </div>
+        </details>
+
+        <details>
+          <summary><strong>¿Cómo usar esta calculadora?</strong> (3 pasos)</summary>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:15px;">
+            <div class="paso-guia">
+              <div class="numero-circulo">1</div>
+              <strong>Ingrese datos</strong><br><small>Pega o escribe los valores separados por comas</small>
+            </div>
+            <div class="paso-guia">
+              <div class="numero-circulo">2</div>
+              <strong>Nivel de confianza</strong><br><small>90%, 95% o 99% (95% es el más usado)</small>
+            </div>
+            <div class="paso-guia">
+              <div class="numero-circulo">3</div>
+              <strong>Revise resultados</strong><br><small>Intervalo y pasos detallados</small>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="form-card fixed-width">
+        <textarea id="datos-media" placeholder="Ej: 23, 27, 19, 30, 28, 25..."></textarea>
+        <div class="input-group">
+          <label for="confianza-media">Nivel de confianza</label>
+          <input type="range" id="confianza-media" min="90" max="99" value="95" oninput="updateSlider(this.value)">
+          <span id="slider-value">95%</span>
+        </div>
+        <button class="calc" onclick="calcularMedia()">Calcular</button>
+      </div>
+
+      <div id="resultado-media" class="results-grid"></div>
+      <button class="toggle-steps" onclick="toggleSteps('media')">Mostrar Pasos Detallados</button>
+      <div id="pasos-media" class="pasoapaso"></div>
+    </section>
+
+    <!-- PESTAÑA PROPORCIÓN -->
+    <section id="proporcion" class="tab-content">
+      <!-- Botón Limpiar Visible -->
+      <button onclick="limpiarProporcion()" class="btn-limpiar">
+        <i class="fas fa-trash-alt"></i> Limpiar campos
+      </button>
+
+      <div class="conceptos">
+        <h2>Conceptos Clave</h2>
+        <p>Estimamos una proporción poblacional (p) a partir de una muestra (x éxitos de n ensayos). Wilson es el método más robusto, especialmente con muestras pequeñas.</p>
+
+        <details>
+          <summary><strong>Fórmulas de Estimación Puntual</strong></summary>
+          <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin:15px 0;">
+            <ul style="line-height:2.2; font-size:1.05em;">
+              <li><strong>MLE:</strong> $$\hat{p} = \dfrac{x}{n}$$</li>
+              <li><strong>Jeffrey:</strong> $$\hat{p} = \dfrac{x + 0.5}{n + 1}$$</li>
+              <li><strong>Wilson (recomendado):</strong> $$\tilde{p} = \dfrac{x + \dfrac{z^2}{2}}{n + z^2}$$</li>
+              <li><strong>Laplace:</strong> $$\hat{p} = \dfrac{x + 1}{n + 2}$$</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><strong>¿Cómo usar esta calculadora?</strong> (3 pasos)</summary>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:15px;">
+            <div class="paso-guia">
+              <div class="numero-circulo">1</div>
+              <strong>Ingrese datos</strong><br><small>Cantidad de éxitos y total de muestra</small>
+            </div>
+            <div class="paso-guia">
+              <div class="numero-circulo">2</div>
+              <strong>Nivel de confianza</strong><br><small>90%, 95% o 99% (95% es el más usado)</small>
+            </div>
+            <div class="paso-guia">
+              <div class="numero-circulo">3</div>
+              <strong>Revise resultados</strong><br><small>El mejor método se resalta automáticamente</small>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="form-card">
+        <div class="input-group">
+          <label for="exitos">Número de éxitos (x)</label>
+          <input type="number" id="exitos" min="0" placeholder="Ej: 42">
+        </div>
+        <div class="input-group">
+          <label for="tamano">Tamaño de muestra (n)</label>
+          <input type="number" id="tamano" min="1" placeholder="Ej: 100">
+        </div>
+        <div class="input-group">
+          <label for="nivel-conf">Nivel de confianza (%)</label>
+          <input type="range" id="nivel-conf" min="90" max="99" value="95" oninput="updateSliderProp(this.value)">
+          <span id="slider-prop-value">95%</span>
+        </div>
+        <div class="input-group readonly">
+          <label>Puntuación Z</label>
+          <input type="text" id="z-value" readonly placeholder="Se calcula automáticamente">
+        </div>
+        <button class="calc" onclick="calcularProporcion()">Calcular Estimaciones</button>
+      </div>
+
+      <div id="resultados-prop" class="results-grid"></div>
+      <div id="mejor-estimado" class="mejor-card"></div>
+      <button class="toggle-steps" onclick="mostrarPasosProporcion()">Mostrar Pasos Detallados</button>
+      <div id="pasos-prop" class="pasoapaso"></div>
+    </section>
+
+    <!-- Resto del HTML (ejemplos, historial, FAQ, footer) sin cambios -->
+    <section id="ejemplo" class="tab-content">
+      <div class="ejemplo-practico-container">
+        <h2>Ejemplos Prácticos en Informática</h2>
+        <div class="selector-ejemplos">
+          <button class="btn-ejemplo active" data-id="1">Proyectos a tiempo</button>
+          <button class="btn-ejemplo" data-id="2">Usuarios que hacen clic en botón</button>
+          <button class="btn-ejemplo" data-id="3">Horas diarias en pantalla</button>
+          <button class="btn-ejemplo" data-id="4">Tiempo de carga de página</button>
+        </div>
+        <div id="contenido-ejemplo" class="ejemplo-box"></div>
+        <button id="btn-cargar-ejemplo" class="calc example-btn">
+          Cargar y Calcular Ejemplo Seleccionado
+        </button>
+        <div id="solucion-ejemplo" class="ejemplo-card"></div>
+      </div>
+    </section>
+    
+    <section id="historial" class="tab-content">
+      <div class="conceptos">
+        <h2>Historial de Cálculos</h2>
+        <p>Aquí se guardan automáticamente todos tus cálculos. Puedes compararlos o eliminarlos.</p>
+        <button class="calc" onclick="limpiarHistorial()" style="background:#e74c3c; width:auto; padding:12px 24px;">
+          Limpiar Todo
+        </button>
+      </div>
+      <div id="lista-historial" class="results-grid"></div>
+    </section>
+ <!-- FAQ y Footer (sin cambios) -->
+    <section id="about" class="faq-section">
+      <div class="container-faq">
+        <h2 class="faq-title">Preguntas Frecuentes</h2>
+        <div class="faq-list">
+          <details class="faq-item"><summary>¿Qué es una estimación puntual?</summary><p>Una estimación puntual es un valor único que sirve como la mejor estimación de un parámetro poblacional desconocido basado en datos de muestra.</p></details>
+          <details class="faq-item"><summary>¿Qué es la estimación por intervalo?</summary><p>Es un rango de valores que, con cierto nivel de confianza (90%, 95% o 99%), contiene el verdadero parámetro poblacional.</p></details>
+          <details class="faq-item"><summary>¿Cuándo debo utilizar esta calculadora?</summary><p>Utilice esta calculadora cuando necesite estimar una proporción o media de la población a partir de datos de muestra.</p></details>
+          <details class="faq-item"><summary>¿Cómo elijo el nivel de confianza adecuado?</summary><p>Elija 95% para investigación estándar, 90% para estudios preliminares o 99% cuando se requiera alta precisión.</p></details>
+          <details class="faq-item"><summary>¿Qué tamaño de muestra necesito?</summary><p>Muestras más grandes (n > 30) proporcionan estimaciones más confiables.</p></details>
+          <details class="faq-item"><summary>¿Qué tan precisos son los resultados?</summary><p>La precisión depende del tamaño de la muestra y de la calidad de los datos.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-column">
+          <h4>ACERCA DE</h4>
+          <p>Calculadora avanzada de estimación puntual e intervalos de confianza. Actividad académica desarrollado con tecnologías web.</p>
+        </div>
+        <div class="footer-column">
+          <h4>REFERENCIAS</h4>
+          <ul>
+            <li><a href="https://www.youtube.com/watch?v=cMqgG_lBC2U" target="_blank"><i class="fab fa-youtube"></i> Video explicativo</a></li>
+            <li><a href="https://github.com/tuusuario/tu-repo" target="_blank"><i class="fab fa-github"></i> Código fuente</a></li>
+            <li><a href="#inicio"><i class="fas fa-home"></i> Inicio</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>IDENTIFICACIÓN</h4>
+          <p><i class="fas fa-graduation-cap"></i> UPTAG PNF INFORMATICA</p>
+          <p><i class="fas fa-laptop-code"></i> Matematica Aplicada</p>
+          <!-- Creadores justo debajo, con icono y poco espacio -->
+      <div style="margin-top:18px; font-size:15px;">
+        <p style="display:flex; align-items:center; gap:10px; margin:8px 0;">
+          <i class="fas fa-user-graduate" style="color:#667eea;"></i>
+          <strong>Alexis Petit</strong>
+        </p>
+        <p style="display:flex; align-items:center; gap:10px; margin:8px 0;">
+          <i class="fas fa-user-graduate" style="color:#667eea;"></i>
+          <strong>Luzmary López</strong>
+        </p>
+        <!-- Añade más líneas si hay más compañeros -->
+      </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Calculadora Estadística • Estimacion Puntual e Intervalo • Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+    <button id="btn-up" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
